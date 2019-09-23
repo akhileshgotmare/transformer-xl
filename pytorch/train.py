@@ -10,6 +10,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from fairseq.optim.adafactor import Adafactor
 
 from data_utils import get_lm_corpus
 from mem_transformer import MemTransformerLM
@@ -51,7 +52,7 @@ parser.add_argument('--init_std', type=float, default=0.02,
 parser.add_argument('--proj_init_std', type=float, default=0.01,
                     help='parameters initialized by N(0, init_std)')
 parser.add_argument('--optim', default='adam', type=str,
-                    choices=['adam', 'sgd', 'adagrad'],
+                    choices=['adam', 'sgd', 'adagrad', 'adafactor'],
                     help='optimizer to use.')
 parser.add_argument('--lr', type=float, default=0.00025,
                     help='initial learning rate (0.00025|5 for adam|sgd)')
@@ -326,6 +327,8 @@ elif args.optim.lower() == 'adam':
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
 elif args.optim.lower() == 'adagrad':
     optimizer = optim.Adagrad(model.parameters(), lr=args.lr)
+elif args.optim.lower() == 'adafactor':
+    optimizer = Adafactor(model.parameters(), lr = args.lr)
 
 #### scheduler
 if args.scheduler == 'cosine':
